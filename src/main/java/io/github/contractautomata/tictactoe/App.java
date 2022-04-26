@@ -1,13 +1,4 @@
-package io.github.contractautomataproject.tictactoe;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+package io.github.contractautomata.tictactoe;
 
 import io.github.contractautomata.catlib.automaton.Automaton;
 import io.github.contractautomata.catlib.automaton.label.CALabel;
@@ -16,16 +7,22 @@ import io.github.contractautomata.catlib.automaton.state.State;
 import io.github.contractautomata.catlib.automaton.transition.ModalTransition;
 import io.github.contractautomata.catlib.automaton.transition.Transition;
 import io.github.contractautomata.catlib.converters.AutDataConverter;
-import io.github.contractautomataproject.tictactoe.grid.Grid;
-import io.github.contractautomataproject.tictactoe.symbols.Circle;
-import io.github.contractautomataproject.tictactoe.symbols.Cross;
-import io.github.contractautomataproject.tictactoe.symbols.Symbol;
+import io.github.contractautomata.tictactoe.grid.Grid;
+import io.github.contractautomata.tictactoe.symbols.Circle;
+import io.github.contractautomata.tictactoe.symbols.Cross;
+import io.github.contractautomata.tictactoe.symbols.Symbol;
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class App {
-	private final static String dir = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" +
-			File.separator+"resources"+File.separator;
 
-	private static Random generator = new Random();
+	private static final Random generator = new Random();
 	private static Grid m;
 	private static Symbol player;
 	private static Symbol opponent;
@@ -35,22 +32,13 @@ public class App {
 
 
 	public static void main(String[] args) throws IOException {
-//		m = new Grid("O_2 X_6 X_7 O_8");
-//		AutDataConverter<CALabel> aadc = new AutDataConverter<>(CALabel::new);
-//		opponent = new Cross();
-//		strategy = aadc.importMSCA(dir + "strategy"+opponent.getSymbol()+".data");
-//		insertOpponent(true);
-
-
-		boolean guided = false;
 		System.out.println("Tic-tac-toe!");
-		try (Scanner scan = new Scanner(System.in);) {
-			System.out.println("Type ok if you want your opponent to be guided, anything else otherwise.");
-			System.out.println("Warning: winning against the guided opponent is impossible!");
-			if (scan.nextLine().equals("ok"))
-				guided = true;
-
+		try (Scanner scan = new Scanner(System.in)) {
 			while (true) {
+				System.out.println("Type ok if you want your opponent to be guided, anything else otherwise.");
+				System.out.println("Warning: winning against the guided opponent is impossible!");
+				boolean guided=(scan.nextLine().equals("ok"));
+
 				m = new Grid();
 				System.out.println("Type ok if you want to start first, or type anything else otherwise.");
 				if (scan.nextLine().equals("ok")) {
@@ -63,17 +51,15 @@ public class App {
 
 				if (guided) {
 					System.out.println("Loading the guided opponent...");
-					AutDataConverter<CALabel> adc = new AutDataConverter<>(CALabel::new);
 					if (opponent instanceof Circle) {
 						if (strategyO == null)
-							strategyO = adc.importMSCA(dir + "strategy" + opponent.getSymbol() + ".data");
+							strategyO = loadFile();
 						strategy = strategyO;
 					} else {
 						if (strategyX == null)
-							strategyX = adc.importMSCA(dir + "strategy" + opponent.getSymbol() + ".data");
+							strategyX = loadFile();
 						strategy = strategyX;
 					}
-
 				}
 
 				m.printInformation();
@@ -101,17 +87,35 @@ public class App {
 				else
 					System.out.println("You lose!");
 
+				scan.nextLine();
 
 				System.out.println("Type anything to start a new game, type quit to terminate. ");
 
-				if (scan.next().equals("quit"))
+
+				if (scan.nextLine().equals("quit"))
 					return;
 			}
 		}
 	}
 
+	/**
+	 * used to load a strategy (as package resource)
+	 */
+	private static Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> loadFile() throws IOException {
+		AutDataConverter<CALabel> adc = new AutDataConverter<>(CALabel::new);
+		InputStream in = App.class.getClassLoader().getResourceAsStream("strategy" + opponent.getSymbol() + ".data");
+		File f = new File("strategy" + opponent.getSymbol() + ".data");
+		FileUtils.copyInputStreamToFile(in, f);
+		Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>>  aut = adc.importMSCA("strategy" + opponent.getSymbol() + ".data");
+		f.delete();
+		return aut;
+	}
+
+	/**
+	 * read the user input  and update the configuration of the game
+	 */
 	private static void insertPlayer(Scanner scan) {
-		Integer pos;
+		int pos;
 		do {
 			System.out.println("Insert a valid position");
 			pos = scan.nextInt();
@@ -120,22 +124,35 @@ public class App {
 
 	}
 
+	/**
+	 * pick a move of the opponent, using a strategy if guided or randomly otherwise
+	 */
 	private static void insertOpponent(boolean guided) {
 		if (guided) {
+			//select outgoing transitions from the current configuration of the same
 			String conf = m.toStringLine();
 			List<ModalTransition<String,Action,State<String>,CALabel>> choices = new ArrayList<>(strategy.getForwardStar(strategy.getTransition().parallelStream()
 					.filter(t->t.getSource().toString().contains(", "+conf))
 					.map(Transition::getSource)
 					.findAny().orElseThrow(UnsupportedOperationException::new)));
 
-			int move = generator.nextInt(choices.size());
-			//System.out.println("Selected move "+move+" over "+choices.size());
-			m.set(opponent, Integer.parseInt(choices.get(move).getLabel().getAction().getLabel().split("_")[1]));
+			//if a transition has a winning target state it is picked, otherwise one of the available choices is picked randomly
+			choices.stream()
+					.filter(t->new Grid(t.getTarget().toString()).win(opponent.getSymbol()))
+					.findAny().ifPresentOrElse(
+							t->m.set(opponent, Integer.parseInt(t.getLabel().getAction().getLabel().split("_")[1])),
+							()->{
+								int move = generator.nextInt(choices.size());
+								m.set(opponent, Integer.parseInt(choices.get(move).getLabel().getAction().getLabel().split("_")[1]));
+							}
+							);
+
 		}
 		else {
+			//without guide a valid move is chosen randomly
 			List<Integer> choices = IntStream.range(0, 9)
 					.filter(i -> m.isAvailable(i))
-					.mapToObj(i -> i)
+					.boxed()
 					.collect(Collectors.toList());
 			m.set(opponent, choices.get(generator.nextInt(choices.size())));
 		}

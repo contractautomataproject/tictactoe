@@ -1,4 +1,4 @@
-package io.github.contractautomataproject.tictactoe;
+package io.github.contractautomata.tictactoe;
 
 import io.github.contractautomata.catlib.automaton.Automaton;
 import io.github.contractautomata.catlib.automaton.label.CALabel;
@@ -13,12 +13,11 @@ import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.catlib.operations.MSCACompositionFunction;
 import io.github.contractautomata.catlib.operations.MpcSynthesisOperator;
 import io.github.contractautomata.catlib.operations.RelabelingOperator;
-import io.github.contractautomataproject.tictactoe.grid.Grid;
-import io.github.contractautomataproject.tictactoe.symbols.Circle;
-import io.github.contractautomataproject.tictactoe.symbols.Cross;
-import io.github.contractautomataproject.tictactoe.symbols.Symbol;
+import io.github.contractautomata.tictactoe.grid.Grid;
+import io.github.contractautomata.tictactoe.symbols.Circle;
+import io.github.contractautomata.tictactoe.symbols.Cross;
+import io.github.contractautomata.tictactoe.symbols.Symbol;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,10 +36,6 @@ import java.util.stream.Stream;
  * @author Davide Basile
  */
 public class AppBuildStrategy {
-
-    private final static String dir = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" +
-            File.separator+"resources"+File.separator;
-
     private final List<Action> actionsCross;
     private final List<Action> actionsCircle;
     private final Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> automaton;
@@ -69,15 +64,23 @@ public class AppBuildStrategy {
      *
      */
     public static void main(String[] args) throws IOException {
-        System.out.println("Creating the plant automaton, this may take more than 10 minutes...");
+        System.out.println("Creating the plant automaton, this may take some minute...");
         AppBuildStrategy stra = new AppBuildStrategy(9);
-        System.out.println("Plant automaton created.");
+        System.out.println("The plant automaton has "+stra.getAutomaton().getNumStates()+" total states and "+stra.getAutomaton().getTransition().size()+" total transitions.");
 
         AutDataConverter<CALabel> adc = new AutDataConverter<>(CALabel::new);
-        adc.exportMSCA(dir + "strategy"+new Cross().getSymbol()+".data", stra.choosePlayerAndStrategySynthesis(new Cross()));
-        adc.exportMSCA(dir + "strategy"+new Circle().getSymbol()+".data", stra.choosePlayerAndStrategySynthesis(new Circle()));
+        Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> strategyX =
+                stra.choosePlayerAndStrategySynthesis(new Cross());
 
-        System.out.println("The strategies are stored under the folder "+dir);
+        Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> strategyO =
+                stra.choosePlayerAndStrategySynthesis(new Circle());
+
+        adc.exportMSCA("strategy"+new Cross().getSymbol()+".data", strategyX);
+        adc.exportMSCA( "strategy"+new Circle().getSymbol()+".data", strategyO);
+
+        System.out.println("The strategies have been synthesised and stored under this current folder");
+        System.out.println("The strategy for player X has "+strategyX.getNumStates()+ " total states and "+strategyX.getTransition().size()+" total transitions.");
+        System.out.println("The strategy for player O has "+strategyO.getNumStates()+ " total states and "+strategyO.getTransition().size()+" total transitions.");
     }
 
     public Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> getAutomaton() {
@@ -214,8 +217,6 @@ public class AppBuildStrategy {
      * It consists in rendering uncontrollable the transitions of the opponent, mark the
      * successful configurations and synthesise the strategy.
      *
-     * @param player
-     * @return
      */
     private Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> choosePlayerAndStrategySynthesis(Symbol player)  {
 

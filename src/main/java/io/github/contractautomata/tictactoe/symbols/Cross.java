@@ -1,4 +1,4 @@
-package io.github.contractautomataproject.tictactoe.symbols;
+package io.github.contractautomata.tictactoe.symbols;
 
 public class Cross extends Symbol {
 	

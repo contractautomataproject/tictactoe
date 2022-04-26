@@ -1,4 +1,4 @@
-package io.github.contractautomataproject.tictactoe.grid;
+package io.github.contractautomata.tictactoe.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import io.github.contractautomataproject.tictactoe.symbols.Circle;
-import io.github.contractautomataproject.tictactoe.symbols.Cross;
-import io.github.contractautomataproject.tictactoe.symbols.Symbol;
+import io.github.contractautomata.tictactoe.symbols.Cross;
+import io.github.contractautomata.tictactoe.symbols.Circle;
+import io.github.contractautomata.tictactoe.symbols.Symbol;
 
 public class Grid {
 	private final List<List<String>> table;
@@ -73,8 +73,7 @@ public class Grid {
 				 .allMatch(i->table.get(i).get(2-i).equals(sym));
 		
 		return Stream.of(rows,columns,diagonals)
-		.filter(p->p.test(who))
-		.findAny().isPresent();
+		.anyMatch(p->p.test(who));
 	}
 	
 	public boolean win() {
@@ -83,7 +82,7 @@ public class Grid {
 
 	public boolean tie() {
 		return !win() && IntStream.range(0, 9)
-				.allMatch(i->!isAvailable(i));
+				.noneMatch(i-> isAvailable(i));
 	}
 	
 	public Symbol whoHasWon() {

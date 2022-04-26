@@ -1,4 +1,4 @@
-package io.github.contractautomataproject.tictactoe;
+package io.github.contractautomata.tictactoe;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
