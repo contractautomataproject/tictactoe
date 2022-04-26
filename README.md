@@ -39,7 +39,7 @@ This class has also facilities to print at console the current configuration of 
 a configuration stored as label of a state of an automaton.
 
 Finally, the class `symbols.Symbol.java` and its sub-classes `symbols.Circle.java` and `symbol.Cross.java` are used to store 
-information on the representation of each player.
+information about the representation of each player.
 
 
 ### License
