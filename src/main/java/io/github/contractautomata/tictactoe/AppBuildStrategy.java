@@ -41,6 +41,11 @@ public class AppBuildStrategy {
     private final Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> automaton;
     private final int size;
 
+    /**
+     * The constructor instantiates the possible actions of the game and invoke the method buildAutomaton, 
+     * which will build a plant automaton containing all possible moves. The plant automaton must be further 
+     * modified to synthesise the strategy for one of the two players, see main method.
+     */
     public AppBuildStrategy(int size)  {
         this.size=size;
 
@@ -60,8 +65,10 @@ public class AppBuildStrategy {
     }
 
     /**
-     * main method to synthesise and store the strategies
-     *
+     * Main method to synthesise and store the strategies.
+     * Initially an object of this class is instantiated to build the plant automaton. 
+     * Method choosePlayerAndStrategySynthesis is used to refine the plant automaton to a strategy for 
+     * one of the players. These strategies are finally stored into two separate files.
      */
     public static void main(String[] args) throws IOException {
         System.out.println("Creating the plant automaton, this may take some minute...");
@@ -88,8 +95,11 @@ public class AppBuildStrategy {
     }
 
     /**
-     * this method build the plant automaton, which is composed of the two players moving in turn and performing only valid moves.
-     *
+     * this method builds the plant automaton, which is composed of the two players moving in turn and performing only valid moves.
+     * The starting automaton is created by composing two automata, one for each player. 
+     * Each of these automata has one (initial and final) state and a loop transition for each possible action, that is, all behaviour is allowed. 
+     * The methods turnMoves and noDuplicateMoves are invoked to refine this initial automaton, using the synthesis, to one 
+     * where only valid moves are possible, which is then returned.
      */
     private Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> buildAutomaton()  {
         State<String> cs_circle = new State<>(List.of(new BasicState<>("0", true, true)));
@@ -112,7 +122,11 @@ public class AppBuildStrategy {
     }
 
     /**
-     * auxiliary method for creating transitions
+     * auxiliary method for creating transitions. 
+     * The method returns a set of transitions from source to target state with a label that is produced by 
+     * the function createLabel by passing as argument the available actions, one for each transition to be created, 
+     * the available actions are either those of O or X or both, according to the parameter Symbol s. 
+     * A predicate can be used to filter the transitions
      */
     private <L extends Label<Action>> Set<ModalTransition<String, Action, State<String>, L>> createTransitions
             (State<String> source, State<String> target, Function<Action,L> createLabel, Predicate<Action> p, Symbol s)
@@ -130,7 +144,7 @@ public class AppBuildStrategy {
 
     /**
      * this method builds the automaton property for enforcing turns between the players, and
-     * synthesise the automaton enforcing this property
+     * synthesise the automaton enforcing this property that is returned. 
      */
     private Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>>
     turnMoves( Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> aut) {
@@ -155,7 +169,8 @@ public class AppBuildStrategy {
 
     /**
      * this method builds the automaton property for forbidding invalid moves, which are inserting in a position
-     * already occupied or inserting from a configuration where the game is over
+     * already occupied or inserting from a configuration where the game is over. 
+     * The returned automaton is obtained by invoking the method noDuplicateMove for each possible move.
      */
     private Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>>
     noDuplicateMoves(Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> aut){
@@ -214,8 +229,8 @@ public class AppBuildStrategy {
 
     /**
      * this method synthesise the strategy for one of the two players.
-     * It consists in rendering uncontrollable the transitions of the opponent, mark the
-     * successful configurations and synthesise the strategy.
+     * It consists in rendering uncontrollable the transitions of the opponent, and in marking the
+     * successful configurations where the player wins or ties, and synthesise the strategy that is returned.
      *
      */
     private Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> choosePlayerAndStrategySynthesis(Symbol player)  {
