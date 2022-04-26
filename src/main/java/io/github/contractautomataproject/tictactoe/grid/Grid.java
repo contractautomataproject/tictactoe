@@ -1,8 +1,9 @@
-package io.github.contractautomataproject.tictactoe;
+package io.github.contractautomataproject.tictactoe.grid;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -10,15 +11,25 @@ import io.github.contractautomataproject.tictactoe.symbols.Circle;
 import io.github.contractautomataproject.tictactoe.symbols.Cross;
 import io.github.contractautomataproject.tictactoe.symbols.Symbol;
 
-public class Matrix {
+public class Grid {
 	private final List<List<String>> table;
 
-	public Matrix() {
+	public Grid() {
 		super();
 		this.table = new ArrayList<>(3);
 		this.table.add(new ArrayList<>(List.of(" ", " ", " ")));
 		this.table.add(new ArrayList<>(List.of(" ", " ", " ")));
 		this.table.add(new ArrayList<>(List.of(" ", " ", " ")));
+	}
+
+	public Grid(String fill) {
+		this();
+		for (Symbol s : List.of(new Cross(),new Circle())){
+			for (int i=0;i<9;i++){
+				if (fill.contains(s.getSymbol()+"_"+i))
+					this.set(s,i);
+			}
+		}
 	}
 	
 	public void set(Symbol s, Integer pos) {
@@ -32,12 +43,19 @@ public class Matrix {
 	public String toString() {
 		return table.get(0) + System.lineSeparator() + table.get(1) + System.lineSeparator() + table.get(2);
 	}
+
+	public String toStringLine(){
+		return IntStream.range(0,9)
+				.mapToObj(i-> (isAvailable(i))?"_"+i:table.get(i/3).get(i%3)+"_"+i)
+				.collect(Collectors.joining(", "));
+	}
 	
 	public void printInformation() {
 		System.out.println("Each number corresponds to a position in the table : ");
 		System.out.println(List.of("0","1","2") + System.lineSeparator() + 
 				List.of("3","4","5") + System.lineSeparator() + 
 				List.of("6","7","8"));
+		System.out.println();
 	}
 	
 	public boolean win(String who) {
@@ -62,6 +80,11 @@ public class Matrix {
 	public boolean win() {
 		return win(Circle.circle) || win(Cross.cross);
 	}
+
+	public boolean tie() {
+		return !win() && IntStream.range(0, 9)
+				.allMatch(i->!isAvailable(i));
+	}
 	
 	public Symbol whoHasWon() {
 		if (win(Circle.circle))
@@ -69,7 +92,7 @@ public class Matrix {
 		else if (win(Cross.cross))
 			return new Cross();
 		else 
-			throw new UnsupportedOperationException();
+			return null;
 	}
 
 }
