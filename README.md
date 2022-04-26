@@ -2,12 +2,14 @@
 
 This repository contains an implementation of the tic-tac-toe game.
 This software is an example of usage of the contract automata library (CATLib) to model this game and 
-synthesise (offline) the winning strategies of both players, which will be used at runtime by the 
+synthesise (offline) the strategies of both players, which will be used at runtime by the 
 computer to play against a human.
 
 It is possible to choose between X and O players to play against the computer. 
 The computer can either play randomly, or following a synthesised strategy. 
 In this last case, the strategy allows the computer to never lose a game (it always wins or ties).
+The synthesised strategy is <em>most permissive</em>: all plays in which the computer ties or wins are 
+in the strategy.
 
 ### Getting started
 
