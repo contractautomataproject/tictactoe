@@ -8,9 +8,10 @@ computer to play against a human.
 It is possible to choose between X and O players to play against the computer. 
 The computer can either play randomly, or following a synthesised strategy. 
 In this last case, the strategy allows the computer to never lose a game (it always wins or ties).
+
 ### Getting started
 
-The easiest way to start is to download the released jar files of this repository. 
+The easiest way to start is to download the released jar files of this repository (see Releases in the right column). 
 These files are runnable from command-line, and  they only require a Java distribution compatible with version 11.
 
 To play the game type:
