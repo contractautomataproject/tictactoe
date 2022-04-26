@@ -38,12 +38,12 @@ The two executable classes are `App.java` and `AppBuildStrategy.java`.
 `App.java` contains the game, whilst  `AppBuildStrategy.java` is used to create (offline) the strategies that 
 are used by `App.java` to play the game. The used automata are built or synthesised inside `AppBuildStrategy.java`.
 
-The class `grid.Grid.java` is used to store a configuration of the game, to update the configuration, and 
+Inside the package `grid`, the class `Grid.java` is used to store a configuration of the game, to update the configuration, and 
 has methods to check if the configuration is winning for some player or if it is a tie. 
 This class has also facilities to print at console the current configuration of the game, and to import/export 
 a configuration stored as label of a state of an automaton.
 
-Finally, the class `symbols.Symbol.java` and its sub-classes `symbols.Circle.java` and `symbol.Cross.java` are used to store 
+Finally, inside the package `symbols`, the class `Symbol.java` and its sub-classes `Circle.java` and `Cross.java` are used to store 
 information about the representation of each player.
 
 
