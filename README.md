@@ -23,7 +23,7 @@ To synthesise the strategies type: (the strategies will be stored in the same fo
 java -jar tictactoeBuildStrategy-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-Otherwise, clone the repository and see below for information on the classes.
+Otherwise, clone the repository and see below for information about the classes.
 
 ### Classes
 
