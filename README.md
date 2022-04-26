@@ -1,4 +1,4 @@
-#Tic-tac-toe
+# Tic-tac-toe
 
 This repository contains an implementation of the tic-tac-toe game.
 This software is an example of usage of the contract automata library (CATLib) to model this game and 
