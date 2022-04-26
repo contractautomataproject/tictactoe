@@ -26,7 +26,7 @@ java -jar tictactoeBuildStrategy-0.0.2-SNAPSHOT-jar-with-dependencies.jar
 
 Otherwise, clone the repository and see below for information about the classes.
 
-### Classes
+### Implementation
 
 The two executable classes are `App.java` and `AppBuildStrategy.java`.
 
