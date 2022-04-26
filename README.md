@@ -10,9 +10,9 @@ The computer can either play randomly, or following a synthesised strategy.
 In this last case, the strategy allows the computer to never lose a game (it always wins or ties).
 The synthesised strategy is <em>most permissive</em>: all plays in which the computer ties or wins are 
 in the strategy. 
+To keep this example as simple as possible, no optimization is performed to reduce the state-space.
 In particular, there are 5478 total reachable configurations of the game, of which 3878 are in the 
 strategy of player X and 2094 in the strategy of player O.
-To keep this example as simple as possible, no optimization is performed to reduce the state-space.
 
 ### Getting started
 
