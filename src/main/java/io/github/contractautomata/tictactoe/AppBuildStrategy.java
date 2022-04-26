@@ -170,7 +170,8 @@ public class AppBuildStrategy {
     /**
      * this method builds the automaton property for forbidding invalid moves, which are inserting in a position
      * already occupied or inserting from a configuration where the game is over. 
-     * The returned automaton is obtained by invoking the method noDuplicateMove for each possible move.
+     * The returned automaton is obtained by invoking the method noDuplicateMove for each possible move, which 
+     * incrementally refines the parameter aut.
      */
     private Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>>
     noDuplicateMoves(Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> aut){
@@ -188,7 +189,9 @@ public class AppBuildStrategy {
     }
 
     /**
-     * used by method noDuplicateMoves for a single move
+     * This method refines the argument aut to an automaton where the move passed argument can be performend only 
+     * once by one of the two players. It uses the model checking synthesis operator of CATLib, where the property 
+     * enforced by guarantees that the move is never duplicated.
      */
     private Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>>
     noDuplicateMove(String move,
@@ -228,9 +231,9 @@ public class AppBuildStrategy {
 
 
     /**
-     * this method synthesise the strategy for one of the two players.
-     * It consists in rendering uncontrollable the transitions of the opponent, and in marking the
-     * successful configurations where the player wins or ties, and synthesise the strategy that is returned.
+     * this method synthesises the strategy for one of the two players (passed as argument).
+     * It consists in rendering uncontrollable the transitions of the opponent, and in marking as 
+     * final only the configurations where the player wins or ties, and synthesise the strategy that is returned.
      *
      */
     private Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> choosePlayerAndStrategySynthesis(Symbol player)  {
@@ -247,7 +250,7 @@ public class AppBuildStrategy {
                 .collect(Collectors.toSet());
 
 
-        //add transitions to a new winning state when player wins
+        //add transitions to a new final state when player wins or ties
         State<String> win = new State<>(IntStream.range(0,12)
                 .mapToObj(i->new BasicState<>("Success",false,true))
                 .collect(Collectors.toList()));
