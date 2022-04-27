@@ -45,7 +45,35 @@ a configuration stored as label of a state of an automaton.
 Finally, inside the package `symbols`, the class `Symbol.java` and its sub-classes `Circle.java` and `Cross.java` are used to store 
 information about the representation of each player.
 
+Concerning the realization of the strategy, this is implemented in `AppBuildStrategy.java`,  
+by instantiating different automata, which are then composed, and used for the synthesis.
 
+Firstly, 9 automata are instantiated, 
+each one represents the typing of X or O to a specific position. 
+Each of these automata has three states (no symbol, X or O) the one for position 0 is displayed below.
+
+![Position zero](src/main/resources/move_0.png)
+
+A further automaton `turns` is necessary for enforcing turns between X and O, where X is the first to move.
+This automaton has two states, one for each turn. 
+From each turn/state, there are 8 outgoing transitions to the other state, one for each of the 
+symbol having turn at a position.
+
+![Turns](src/main/resources/turns.png)
+
+The composition of these 9+1 automata is computed. 
+In the composition, the requests of `turns` are all matched by the offers of one of the other 
+automata in the composition, so that all transitions in the compositions are matches.
+After that, depending on which player is selected, the composed automaton is edited before 
+starting the synthesis. 
+The moves of the opponent are turned to uncontrollable, the configurations where the opponent 
+wins are turned to forbidden and only the configurations where the player wins or ties are marked as final.
+The synthesised controller/strategy will guarantee the maximal behaviour where a final state is reachable, forbidden states are 
+never traversed, and uncontrollable transitions are never blocked. 
+Below is an image of the strategy for player O that is automatically computed.
+These images have been created using CAT_App.
+
+![Strategy 0](src/main/resources/strategyO.png)
 ### License
 
 This software is available under GPL-3.0 license.

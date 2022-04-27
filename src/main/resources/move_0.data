@@ -1,0 +1,6 @@
+Rank: 1
+Initial state: [_0]
+Final states: [[O_0, X_0, _0]]
+Transitions: 
+([_0],[!O_0],[O_0])
+([_0],[!X_0],[X_0])

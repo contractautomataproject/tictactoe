@@ -2,7 +2,6 @@ package io.github.contractautomata.tictactoe;
 
 import io.github.contractautomata.catlib.automaton.Automaton;
 import io.github.contractautomata.catlib.automaton.label.CALabel;
-import io.github.contractautomata.catlib.automaton.label.Label;
 import io.github.contractautomata.catlib.automaton.label.action.Action;
 import io.github.contractautomata.catlib.automaton.label.action.OfferAction;
 import io.github.contractautomata.catlib.automaton.label.action.RequestAction;
@@ -20,11 +19,9 @@ import io.github.contractautomata.tictactoe.symbols.Cross;
 import io.github.contractautomata.tictactoe.symbols.Symbol;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -128,6 +125,16 @@ public class AppBuildStrategy {
                 actionsCircle.stream()
                         .map(ac->new ModalTransition<>(cs_circle,new CALabel(1,0,ac),cs_cross, ModalTransition.Modality.PERMITTED))
         ) .collect(Collectors.toSet())));
+
+
+        AutDataConverter<CALabel> adc = new AutDataConverter<>(CALabel::new);
+        try{
+            adc.exportMSCA("move_0",aut.get(0));
+            adc.exportMSCA("turns",aut.get(9));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         System.out.println("...computing the composition...");
 

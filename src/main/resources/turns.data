@@ -1,0 +1,22 @@
+Rank: 1
+Initial state: [TurnCross]
+Final states: [[TurnCircle, TurnCross]]
+Transitions: 
+([TurnCircle],[?O_0],[TurnCross])
+([TurnCircle],[?O_1],[TurnCross])
+([TurnCircle],[?O_2],[TurnCross])
+([TurnCircle],[?O_3],[TurnCross])
+([TurnCircle],[?O_4],[TurnCross])
+([TurnCircle],[?O_5],[TurnCross])
+([TurnCircle],[?O_6],[TurnCross])
+([TurnCircle],[?O_7],[TurnCross])
+([TurnCircle],[?O_8],[TurnCross])
+([TurnCross],[?X_0],[TurnCircle])
+([TurnCross],[?X_1],[TurnCircle])
+([TurnCross],[?X_2],[TurnCircle])
+([TurnCross],[?X_3],[TurnCircle])
+([TurnCross],[?X_4],[TurnCircle])
+([TurnCross],[?X_5],[TurnCircle])
+([TurnCross],[?X_6],[TurnCircle])
+([TurnCross],[?X_7],[TurnCircle])
+([TurnCross],[?X_8],[TurnCircle])
