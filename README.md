@@ -11,8 +11,7 @@ In this last case, the strategy allows the computer to never lose a game (it alw
 The synthesised strategy is <em>most permissive</em>: all plays in which the computer ties or wins are 
 in the strategy. 
 To keep this example as simple as possible, no optimization is performed to reduce the state-space.
-In particular, there are 5478 total reachable configurations of the game, of which 3878 are in the 
-strategy of player X and 2094 in the strategy of player O.
+In particular, there are 3878 reachable configurations in the strategy of player X and 2094 in the strategy of player O.
 
 ### Getting started
 
@@ -21,12 +20,12 @@ These files are runnable from command-line, and  they only require a Java distri
 
 To play the game type:
 ```console
-java -jar tictactoe-0.0.2-SNAPSHOT-jar-with-dependencies.jar
+java -jar tictactoe-0.0.3-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 To synthesise the strategies type: (the strategies will be stored in the same folder where the jar is located).
 ```console
-java -jar tictactoeBuildStrategy-0.0.2-SNAPSHOT-jar-with-dependencies.jar
+java -jar tictactoeBuildStrategy-0.0.3-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 Otherwise, clone the repository and see below for information about the classes.

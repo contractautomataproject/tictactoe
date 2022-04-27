@@ -39,6 +39,9 @@ public class App {
 				System.out.println("Warning: winning against the guided opponent is impossible!");
 				boolean guided=(scan.nextLine().equals("ok"));
 
+				if (!guided)
+					System.out.println("You have selected an opponent performing random moves.");
+
 				m = new Grid();
 				System.out.println("Type ok if you want to start first, or type anything else otherwise.");
 				if (scan.nextLine().equals("ok")) {
@@ -132,7 +135,7 @@ public class App {
 			//select outgoing transitions from the current configuration of the same
 			String conf = m.toStringLine();
 			List<ModalTransition<String,Action,State<String>,CALabel>> choices = new ArrayList<>(strategy.getForwardStar(strategy.getTransition().parallelStream()
-					.filter(t->t.getSource().toString().contains(", "+conf))
+					.filter(t->t.getSource().toString().contains("["+conf))
 					.map(Transition::getSource)
 					.findAny().orElseThrow(UnsupportedOperationException::new)));
 
