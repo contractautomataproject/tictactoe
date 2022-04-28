@@ -45,6 +45,8 @@ a configuration stored as label of a state of an automaton.
 Finally, inside the package `symbols`, the class `Symbol.java` and its sub-classes `Circle.java` and `Cross.java` are used to store 
 information about the representation of each player.
 
+#### Synthesis 
+
 Concerning the realization of the strategy, this is implemented in `AppBuildStrategy.java`.
 Firstly, 9 automata are instantiated, each one represents the typing of X or O to a specific position. 
 Each of these automata has three states (no symbol, X or O). The one for position 0 is displayed below.
@@ -59,10 +61,10 @@ From each turn/state, there are 8 outgoing transitions to the other state.
 
 The composition of these 9+1 automata is firstly computed. 
 In the composition, the requests of `turns` are all matched by the offers of one of the other 
-automata in the composition, so that all transitions in the compositions are matches between an offer and a request.
+automata in the composition, so that all transitions in the composition are matches between an offer and a request.
 After that, depending on which player is selected, the composed automaton is slightly modified before 
 starting the synthesis. 
-The moves of the opponent are turned to uncontrollable, transitions outgoing winning states are removed (for both players), and only the configurations where the player wins or ties are marked as final.
+The moves of the opponent are turned to uncontrollable, transitions outgoing winning states are removed (for both players), and only the configurations where the selected player wins or ties are marked as final.
 
 The synthesised controller/strategy will guarantee the maximal behaviour where a final state is reachable, forbidden states are 
 never traversed, and uncontrollable transitions are never blocked. 
