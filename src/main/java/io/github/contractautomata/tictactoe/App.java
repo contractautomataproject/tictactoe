@@ -5,7 +5,6 @@ import io.github.contractautomata.catlib.automaton.label.CALabel;
 import io.github.contractautomata.catlib.automaton.label.action.Action;
 import io.github.contractautomata.catlib.automaton.state.State;
 import io.github.contractautomata.catlib.automaton.transition.ModalTransition;
-import io.github.contractautomata.catlib.automaton.transition.Transition;
 import io.github.contractautomata.catlib.converters.AutDataConverter;
 import io.github.contractautomata.tictactoe.grid.Grid;
 import io.github.contractautomata.tictactoe.symbols.Circle;
@@ -17,33 +16,25 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class App {
 
+	private static State<String> currentState;
 	private static final Random generator = new Random();
-	private static Grid m;
-	private static Symbol player;
 	private static Symbol opponent;
 	private static Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> strategyX=null;
 	private static Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> strategyO=null;
-	private static Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> strategy;
 
 
 	public static void main(String[] args) throws IOException {
 		System.out.println("Tic-tac-toe!");
+		System.out.println("Warning: winning against the computer is impossible!");
+
 		try (Scanner scan = new Scanner(System.in)) {
 			while (true) {
-				System.out.println("Type ok if you want your opponent to be guided, anything else otherwise.");
-				System.out.println("Warning: winning against the guided opponent is impossible!");
-				boolean guided=(scan.nextLine().equals("ok"));
-
-				if (!guided)
-					System.out.println("You have selected an opponent performing random moves.");
-
-				m = new Grid();
 				System.out.println("Type ok if you want to start first, or type anything else otherwise.");
+
+				Symbol player;
 				if (scan.nextLine().equals("ok")) {
 					player = new Cross();
 					opponent = new Circle();
@@ -52,49 +43,41 @@ public class App {
 					opponent = new Cross();
 				}
 
-				if (guided) {
-					System.out.println("Loading the guided opponent...");
-					if (opponent instanceof Circle) {
-						if (strategyO == null)
-							strategyO = loadFile();
-						strategy = strategyO;
-					} else {
-						if (strategyX == null)
-							strategyX = loadFile();
-						strategy = strategyX;
+				System.out.println("Loading the guided opponent...");
+				Automaton<String, Action, State<String>, ModalTransition<String, Action, State<String>, CALabel>> strategy;
+				if (opponent instanceof Circle) {
+					if (strategyO == null)
+						strategyO = loadFile();
+					strategy = strategyO;
+				} else {
+					if (strategyX == null)
+						strategyX = loadFile();
+					strategy = strategyX;
+				}
+
+				new Grid().printInformation();
+				currentState = strategy.getInitial();
+				while(currentState!=null){
+					Set<ModalTransition<String,Action,State<String>,CALabel>> forwardStar = strategy.getForwardStar(currentState);
+					if (check(forwardStar)) {
+						currentState=null;
+					}
+					else {
+						Symbol turn = (currentState.getState().get(9).getState().equals("TurnCross")) ?
+								new Cross() : new Circle();
+
+						if (player.getClass().equals(turn.getClass()))
+							currentState = insertPlayer(scan,forwardStar);
+						else
+							currentState = insertOpponent(forwardStar);
+
+						System.out.println(new Grid(currentState.toString()));
+						System.out.println();
 					}
 				}
 
-				m.printInformation();
-
-				Symbol turn = new Cross();
-				while (!m.win() && !m.tie()) {
-					if (player.getClass().equals(turn.getClass()))
-						insertPlayer(scan);
-					else
-						insertOpponent(guided);
-
-					if (turn instanceof Cross)
-						turn = new Circle();
-					else
-						turn = new Cross();
-
-					System.out.println(m.toString());
-					System.out.println();
-				}
-
-				if (m.whoHasWon() == null)
-					System.out.println("Draw!");
-				else if (player.getClass().equals(m.whoHasWon().getClass()))
-					System.out.println("Congratulations, you win!");
-				else
-					System.out.println("You lose!");
-
 				scan.nextLine();
-
 				System.out.println("Type anything to start a new game, type quit to terminate. ");
-
-
 				if (scan.nextLine().equals("quit"))
 					return;
 			}
@@ -117,48 +100,44 @@ public class App {
 	/**
 	 * read the user input  and update the configuration of the game
 	 */
-	private static void insertPlayer(Scanner scan) {
-		int pos;
-		do {
-			System.out.println("Insert a valid position");
-			pos = scan.nextInt();
-		} while (pos < 0 || pos > 8 || (pos >= 0 && pos <= 8 && !m.isAvailable(pos)));
-		m.set(player, pos);
+	private static State<String> insertPlayer(Scanner scan,Set<ModalTransition<String,Action,State<String>,CALabel>> forwardStar) {
+		ModalTransition<String,Action,State<String>,CALabel> value;
+		do{
+			System.out.println("Insert a valid position (a number from 0 to 8 and the corresponding position must be free)");
+			int pos = scan.nextInt();
+			value=forwardStar.stream()
+					.filter(t->t.getLabel().getAction().getLabel().contains(pos+""))
+					.findAny().orElse(null);
+
+		} while (value==null);
+		return value.getTarget();
 
 	}
 
 	/**
 	 * pick a move of the opponent, using a strategy if guided or randomly otherwise
 	 */
-	private static void insertOpponent(boolean guided) {
-		if (guided) {
-			//select outgoing transitions from the current configuration of the same
-			String conf = m.toStringLine();
-			List<ModalTransition<String,Action,State<String>,CALabel>> choices = new ArrayList<>(strategy.getForwardStar(strategy.getTransition().parallelStream()
-					.filter(t->t.getSource().toString().contains("["+conf))
-					.map(Transition::getSource)
-					.findAny().orElseThrow(UnsupportedOperationException::new)));
+	private static State<String> insertOpponent(Set<ModalTransition<String,Action,State<String>,CALabel>> forwardStar) {
+		//if a transition has a winning target state it is picked, otherwise one of the available choices is picked randomly
+		return forwardStar.stream()
+				.filter(t->new Grid(t.getTarget().toString()).win(opponent.getSymbol()))
+				.findAny()
+				.orElse(new ArrayList<>(forwardStar).get(generator.nextInt(forwardStar.size())))
+				.getTarget();
+	}
 
-			//if a transition has a winning target state it is picked, otherwise one of the available choices is picked randomly
-			choices.stream()
-					.filter(t->new Grid(t.getTarget().toString()).win(opponent.getSymbol()))
-					.findAny().ifPresentOrElse(
-							t->m.set(opponent, Integer.parseInt(t.getLabel().getAction().getLabel().split("_")[1])),
-							()->{
-								int move = generator.nextInt(choices.size());
-								m.set(opponent, Integer.parseInt(choices.get(move).getLabel().getAction().getLabel().split("_")[1]));
-							}
-							);
-
+	private static boolean check(Set<ModalTransition<String,Action,State<String>,CALabel>> forwardStar) {
+		if (forwardStar.stream()
+				.anyMatch(t->t.getLabel().getAction().getLabel().contains("tie"))) {
+			System.out.println("Draw!");
+			return true;
 		}
-		else {
-			//without guide a valid move is chosen randomly
-			List<Integer> choices = IntStream.range(0, 9)
-					.filter(i -> m.isAvailable(i))
-					.boxed()
-					.collect(Collectors.toList());
-			m.set(opponent, choices.get(generator.nextInt(choices.size())));
+		else if (forwardStar.stream()
+				.anyMatch(t->t.getLabel().getAction().getLabel().contains("win"))) {
+			System.out.println("You lose!");
+			return true;
 		}
+		return false;
 	}
 
 }

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -146,17 +147,17 @@ public class AppBuildStrategy {
 
         Set<ModalTransition<String, Action, State<String>, CALabel>> transitions =
                 ro.apply(comp).parallelStream()
-                //removing transitions from states where someone wins or there is a draw
-                .filter(t->{
-                    Grid m = new Grid(t.getSource().toString());
-                    return !(m.win()||m.tie());
-                })
-                //turning the opponent transitions to uncontrollable
-                .map(t->new ModalTransition<>(t.getSource(),t.getLabel(),t.getTarget(),
-                        t.getLabel().getAction().getLabel().startsWith(opponent.getSymbol())?
-                                ModalTransition.Modality.URGENT: ModalTransition.Modality.PERMITTED
-                ))
-                .collect(Collectors.toSet());
+                        //removing transitions from states where someone wins or there is a draw
+                        .filter(t->{
+                            Grid m = new Grid(t.getSource().toString());
+                            return !(m.win()||m.tie());
+                        })
+                        //turning the opponent transitions to uncontrollable
+                        .map(t->new ModalTransition<>(t.getSource(),t.getLabel(),t.getTarget(),
+                                t.getLabel().getAction().getLabel().startsWith(opponent.getSymbol())?
+                                        ModalTransition.Modality.URGENT: ModalTransition.Modality.PERMITTED
+                        ))
+                        .collect(Collectors.toSet());
 
         //creating the unique final state
         State<String> win = new State<>(IntStream.range(0,10)
@@ -164,18 +165,17 @@ public class AppBuildStrategy {
                 .collect(Collectors.toList()));
 
 
-        //add transitions to win from states where player wins or ties
-        transitions.addAll(transitions.parallelStream()
-                .flatMap(t->Stream.of(t.getSource(),t.getTarget()))
-                .filter(s->{
-                    Grid m = new Grid(s.toString());
-                    return m.win(player.getSymbol()) || m.tie();
-                })
-                .map(s->new ModalTransition<>(s,
-                        new CALabel(10,0,new OfferAction("success")),
+        //add transitions to success from states where player wins or ties
+        Map.of((Predicate<State<String>>) s -> new Grid(s.toString()).win(player.getSymbol()), "win",
+                s -> new Grid(s.toString()).tie(), "tie")
+                .forEach((key, value) -> transitions.addAll(transitions.parallelStream()
+                .flatMap(t -> Stream.of(t.getSource(), t.getTarget()))
+                .filter(key)
+                .map(s -> new ModalTransition<>(s,
+                        new CALabel(10, 0, new OfferAction(value)),
                         win,
                         ModalTransition.Modality.PERMITTED))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet())));
 
         System.out.println("...computing the synthesis... ");
         MpcSynthesisOperator<String> mso = new MpcSynthesisOperator<>(l->true);

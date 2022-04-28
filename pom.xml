@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.github.contractautomataproject</groupId>
-	<artifactId>tictactoe</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<artifactId>tictactoeBuildStrategy</artifactId>
+	<version>0.0.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>tictactoe</name>
@@ -62,7 +62,7 @@
 						<archive>
 							<manifest>
 								<mainClass>
-									io.github.contractautomata.tictactoe.App
+									io.github.contractautomata.tictactoe.AppBuildStrategy
 								</mainClass>
 							</manifest>
 						</archive>
