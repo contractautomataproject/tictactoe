@@ -66,7 +66,7 @@ After that, depending on which player is selected, the composed automaton is sli
 starting the synthesis. 
 The moves of the opponent are turned to uncontrollable, transitions outgoing winning states are removed (for both players), and only the configurations where the selected player wins or ties are marked as final.
 
-The synthesised controller/strategy will guarantee the maximal behaviour where a final state is reachable, forbidden states are 
+The synthesised controller/strategy will guarantee the maximal behaviour where a final state is reachable, forbidden states where the opponent wins are 
 never traversed, and uncontrollable transitions are never blocked. 
 Below is an image of the strategy for player O that is automatically computed.
 The images of the automata have been created using CAT_App.
