@@ -56,8 +56,11 @@ public class App {
 				}
 
 				new Grid().printInformation();
+
+				//the game starts from the initial state
 				currentState = strategy.getInitial();
 				while(currentState!=null){
+					//the forward star is the set of possible next moves in the game
 					Set<ModalTransition<String,Action,State<String>,CALabel>> forwardStar = strategy.getForwardStar(currentState);
 					if (check(forwardStar)) {
 						currentState=null;
@@ -98,7 +101,7 @@ public class App {
 	}
 
 	/**
-	 * read the user input  and update the configuration of the game
+	 * read the user input  for the next move
 	 */
 	private static State<String> insertPlayer(Scanner scan,Set<ModalTransition<String,Action,State<String>,CALabel>> forwardStar) {
 		ModalTransition<String,Action,State<String>,CALabel> value;
@@ -115,7 +118,7 @@ public class App {
 	}
 
 	/**
-	 * pick a move of the opponent, using a strategy if guided or randomly otherwise
+	 * pick a move for the opponent
 	 */
 	private static State<String> insertOpponent(Set<ModalTransition<String,Action,State<String>,CALabel>> forwardStar) {
 		//if a transition has a winning target state it is picked, otherwise one of the available choices is picked randomly
