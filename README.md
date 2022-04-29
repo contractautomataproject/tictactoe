@@ -23,12 +23,12 @@ These files are runnable from command-line, and  they only require a Java distri
 
 To play the game type:
 ```console
-java -jar tictactoe-0.0.3-SNAPSHOT-jar-with-dependencies.jar
+java -jar tictactoe-0.0.5-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 To synthesise the strategies type: (the strategies will be stored in the same folder where the jar is located).
 ```console
-java -jar tictactoeBuildStrategy-0.0.3-SNAPSHOT-jar-with-dependencies.jar
+java -jar tictactoeBuildStrategy-0.0.5-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 Otherwise, clone the repository and see below for information about the classes.
