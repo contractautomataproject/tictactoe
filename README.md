@@ -13,7 +13,8 @@ contract.</li>
 The synthesised strategy is <em>most permissive</em>: all plays in which the computer ties or wins are 
 in the strategy. 
 To keep this example as simple as possible, no optimization is performed to reduce the state-space.
-In particular, there are 3878 reachable configurations in the strategy of player X and 2094 in the strategy of player O.
+In particular, the total amount of configurations of the game is 5478. 
+There are 3878 reachable configurations in the strategy of player X and 2094 in the strategy of player O.
 
 ### Getting started
 
