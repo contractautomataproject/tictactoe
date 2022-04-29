@@ -71,7 +71,9 @@ To check if a state is winning or draw, the class `Grid.java` is used: an object
 
 The synthesis algorithm formally guarantees that the strategy has the maximal behaviour where a final state is reachable, forbidden states where the opponent wins are 
 never traversed, and uncontrollable transitions are never blocked. 
-Below is an image of the (automatically computed) strategy for player O.
+Below is an image of the (automatically computed) strategy for player O. 
+The image gives an idea on how complex behaviours can be obtained automatically starting from simple automata as those depicted above. 
+The red transitions are the uncontrollable moves. The central state is the final state of the game (with incoming transitions from ties and winning states).
 The images of the automata have been created using CAT_App.
 
 ![Strategy 0](src/main/resources/strategyO.png)
